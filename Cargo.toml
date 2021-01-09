@@ -9,4 +9,3 @@ edition = "2018"
 [dependencies]
 unidecode = "0.3.0"
 itertools = "0.10.0"
-sequence_trie = "0.3.6"
