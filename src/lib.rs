@@ -22,7 +22,7 @@ const NBR_LETTER: usize = 26;
 pub struct Paranagram {
     path_data: String,
     sacamot: Vec<String>,
-    max_len: String,
+    max_len: usize,
 }
 
 impl Paranagram {
@@ -33,14 +33,14 @@ impl Paranagram {
         let mut buffer = String::new();
         file.read_to_string(&mut buffer)?;
 
-        let mut max_len = String::new();
+        let mut max_len = 0;
 
         // Parse the content of the data file to create an vec of all word
         let mut sacamot: Vec<String> = buffer
             .split("\n")
             .map(|s| {
-                if s.len() > max_len.len() {
-                    max_len = s.trim_end().to_owned()
+                if s.len() > max_len {
+                    max_len = s.len()
                 }
                 s.trim_end().to_owned()
             })
