@@ -24,7 +24,7 @@ impl<K: Eq> Trie<K> {
         for i in 0..vec_data.len() {
             let mut new_data = vec_data.clone();
             let key = new_data.remove(i);
-            nodes.insert(key, Trie::new_with_iter(new_data.into_iter())); // TreeNode::new_from_slice(key, &mut new_data[..])
+            nodes.insert(key, Trie::new_with_iter(new_data.into_iter()));
         }
 
         Self{
@@ -49,7 +49,7 @@ impl<K: Eq> Trie<K> {
         for i in 0..vec_data.len() {
             let mut new_data = vec_data.clone();
             let key = new_data.remove(i);
-            nodes.insert(key, Trie::new_with_iter_and_maximun_deep(new_data.into_iter(), maximun_deep - 1)); // TreeNode::new_from_slice(key, &mut new_data[..])
+            nodes.insert(key, Trie::new_with_iter_and_maximun_deep(new_data.into_iter(), maximun_deep - 1));
         }
 
         Self{
