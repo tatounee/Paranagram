@@ -38,11 +38,17 @@ impl Paranagram {
         // Parse the content of the data file to create an vec of all word
         let mut sacamot: Vec<String> = buffer
             .split("\n")
-            .map(|s| {
+            .flat_map(|s| {
                 if s.len() > max_len {
                     max_len = s.len()
                 }
-                s.trim_end().to_owned()
+                let s = s.trim_end().to_owned();
+                if s.len() != 0 {
+                    Some(s)
+                } else {
+                    None
+                }
+
             })
             .collect();
 
