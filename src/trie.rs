@@ -30,6 +30,31 @@ impl<K: Eq> Trie<K> {
         Self{
             nodes,
         }
+    }    
+    
+    pub(crate) fn new_with_iter_and_maximun_deep<I>(data: I, maximun_deep: usize) -> Self
+    where
+        I: Iterator<Item = K>,
+        K: Copy + hash::Hash + PartialEq,
+    {
+        if maximun_deep == 0 {
+            return Self::new();
+        }
+
+        let mut nodes = HashMap::new();
+
+
+        let vec_data = data.into_iter().collect::<Vec<K>>();
+
+        for i in 0..vec_data.len() {
+            let mut new_data = vec_data.clone();
+            let key = new_data.remove(i);
+            nodes.insert(key, Trie::new_with_iter_and_maximun_deep(new_data.into_iter(), maximun_deep - 1)); // TreeNode::new_from_slice(key, &mut new_data[..])
+        }
+
+        Self{
+            nodes,
+        }
     }
 
     pub(crate) fn existing<I>(&self, sentence: I) -> bool
