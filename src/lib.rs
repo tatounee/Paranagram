@@ -3,9 +3,9 @@
 #![allow(unused_variables)]
 #![allow(unused_mut)]
 
-mod symetrical_tree;
+mod trie;
 
-use symetrical_tree::SymetricalTree;
+use trie::Trie;
 
 use std::fmt;
 use std::fs::File;
