@@ -81,16 +81,13 @@ mod test {
         println!("{:?}", paranagram);
     }
 
-    // #[test]
-    // fn test_list_all() {
-    //     let v = Paranagram::generate_trie("0123");
-    //     println!("{:?}", v.get("0"));
-    //     println!("{:?}", v.get("1"));
-    //     println!("{:?}", v.get("2"));
-    //     println!("{:?}", v.get("01"));
-    //     println!("{:?}", v.get("02"));
-    //     println!("{:?}", v.get("0123"));
-    // }
+    #[test]
+    fn find_all_anagram_of_a_word() {
+        let word = "parisien";
+        let paranagram = Paranagram::new("data/word.txt").unwrap();
+        let anagrams = paranagram.existing_anagrams(word);
+        println!("{:?}", anagrams);
+    }
 }
 // Well Tries would make it easier to check if the word exists. So if you put the whole dictionary in a trie:
 

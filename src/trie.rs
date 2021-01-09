@@ -87,6 +87,13 @@ mod test {
     #[test]
     fn new_tree_from_str() {
         let trie = Trie::new_with_iter("012".chars());
+        // println!("{:#?}", trie);
+    }
+
+    #[test]
+    fn new_tree_from_str_and_maximun_deep() {
+        let trie = Trie::new_with_iter_and_maximun_deep("0123".chars(), 3);
+        // println!("{:#?}", trie);
     }
 
     #[test]
