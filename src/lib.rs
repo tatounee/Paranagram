@@ -60,11 +60,17 @@ impl Paranagram {
         })
     }
 
-    // fn generate_trie(sentence: &str) -> Trie<&str> {
-    //     let mut trie: Trie<&str> = Trie::new();
-    //     trie.insert(sentence, ());
-    //     trie
-    // }
+    fn existing_anagrams(&self, sentence: &str) -> Vec<&String> {
+        let trie = Trie::new_with_iter_and_maximun_deep(sentence.chars(), self.max_len);
+        self.sacamot.iter().flat_map(|word| {
+            if trie.existing(word.chars()) {
+                Some(word)
+            } else {
+                None
+            }
+        }).collect::<Vec<&String>>()
+    }
+
 }
 
 impl fmt::Debug for Paranagram {
