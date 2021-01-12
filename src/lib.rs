@@ -96,7 +96,7 @@ mod test {
 
     #[test]
     fn find_all_anagram_of_a_word() {
-        let word = "parisien";
+        let word = "Jean le parisien";
         let paranagram = Paranagram::new("data/word.txt").unwrap();
         let anagrams = paranagram.existing_anagrams(word);
         println!("{:?}", anagrams);
