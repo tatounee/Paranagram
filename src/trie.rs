@@ -3,23 +3,22 @@ use std::collections::HashMap;
 use std::hash;
 
 #[derive(Debug)]
-pub(crate) struct Trie<K> {
-    nodes: HashMap<K, Trie<K>>,
+pub(crate) struct Trie {
+    nodes: HashMap<char, Trie>,
 }
 
-impl<K: Eq> Trie<K> {
+impl Trie {
     pub(crate) fn new() -> Self {
         Self { nodes: HashMap::new()}
     }
 
     pub(crate) fn new_with_iter<I>(data: I) -> Self
     where
-        I: Iterator<Item = K>,
-        K: Copy + hash::Hash + PartialEq,
+        I: Iterator<Item = char>,
     {
         let mut nodes = HashMap::new();
 
-        let vec_data = data.into_iter().collect::<Vec<K>>();
+        let vec_data = data.into_iter().collect::<Vec<char>>();
 
         for i in 0..vec_data.len() {
             let mut new_data = vec_data.clone();
@@ -34,8 +33,7 @@ impl<K: Eq> Trie<K> {
     
     pub(crate) fn new_with_iter_and_maximun_deep<I>(data: I, maximun_deep: usize) -> Self
     where
-        I: Iterator<Item = K>,
-        K: Copy + hash::Hash + PartialEq,
+        I: Iterator<Item = char>,
     {
         if maximun_deep == 0 {
             return Self::new();
@@ -43,8 +41,8 @@ impl<K: Eq> Trie<K> {
 
         let mut nodes = HashMap::new();
 
+        let vec_data = data.into_iter().collect::<Vec<char>>();
 
-        let vec_data = data.into_iter().collect::<Vec<K>>();
 
         for i in 0..vec_data.len() {
             let mut new_data = vec_data.clone();
@@ -59,8 +57,7 @@ impl<K: Eq> Trie<K> {
 
     pub(crate) fn existing<I>(&self, sentence: I) -> bool
     where
-        I: Iterator<Item = K>,
-        K: PartialEq + hash::Hash,
+        I: Iterator<Item = char>,
     {
         let mut current_node = self;
 
@@ -81,7 +78,7 @@ mod test {
 
     #[test]
     fn new_tree() {
-        let tree: Trie<char> = Trie::new();
+        let tree = Trie::new();
     }
 
     #[test]
