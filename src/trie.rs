@@ -2,6 +2,8 @@
 use std::collections::HashMap;
 use std::hash;
 
+use rayon::prelude::*;
+
 #[derive(Debug)]
 pub(crate) struct Trie {
     nodes: HashMap<char, Trie>,
@@ -39,16 +41,13 @@ impl Trie {
             return Self::new();
         }
 
-        let mut nodes = HashMap::new();
-
         let vec_data = data.into_iter().collect::<Vec<char>>();
 
-
-        for i in 0..vec_data.len() {
+        let nodes = (0..vec_data.len()).into_par_iter().map(|i| {
             let mut new_data = vec_data.clone();
             let key = new_data.remove(i);
-            nodes.insert(key, Trie::new_with_iter_and_maximun_deep(new_data.into_iter(), maximun_deep - 1));
-        }
+            (key, Trie::new_with_iter_and_maximun_deep(new_data.into_iter(), maximun_deep - 1))
+        }).collect::<HashMap<char, Trie>>();
 
         Self{
             nodes,
