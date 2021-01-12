@@ -13,11 +13,12 @@ use std::io;
 use std::io::prelude::*;
 use std::path::Path;
 use std::str;
+use std::cmp::min;
 
 use itertools::Itertools;
 use unidecode::unidecode;
 
-const NBR_LETTER: usize = 26;
+const PARANAGRAM_MAX_DEEP: usize = 10;
 
 pub struct Paranagram {
     path_data: String,
@@ -61,7 +62,7 @@ impl Paranagram {
     }
 
     fn existing_anagrams(&self, sentence: &str) -> Vec<&String> {
-        let trie = Trie::new_with_iter_and_maximun_deep(sentence.chars(), self.max_len);
+        let trie = Trie::new_with_iter_and_maximun_deep(sentence.chars(), min(self.max_len, PARANAGRAM_MAX_DEEP));
         self.sacamot.iter().flat_map(|word| {
             if trie.existing(word.chars()) {
                 Some(word)
