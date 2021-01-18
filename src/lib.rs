@@ -15,9 +15,6 @@ use std::path::Path;
 use std::str;
 use std::cmp::min;
 
-use itertools::Itertools;
-use unidecode::unidecode;
-
 const PARANAGRAM_MAX_DEEP: usize = 10;
 
 pub struct Paranagram {
