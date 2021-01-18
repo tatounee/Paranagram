@@ -1,4 +1,3 @@
-
 use std::collections::HashMap;
 
 pub(crate) trait IntoHashMap<K, V> {
@@ -24,9 +23,10 @@ impl HashMapContainsHashMap<char, u16> for HashMap<char, u16> {
     fn contains(&self, other: &HashMap<char, u16>) -> bool {
         for (key, val) in other.iter() {
             if self.contains_key(key) == false {
-                return false
-            }if self.get(key).unwrap() < val {
-                return false
+                return false;
+            }
+            if self.get(key).unwrap() < val {
+                return false;
             }
         }
         true

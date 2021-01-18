@@ -1,4 +1,3 @@
-
 use crate::{hashmap, utils::*};
 
 use std::collections::HashMap;
@@ -7,18 +6,23 @@ use unidecode::unidecode;
 #[derive(Debug)]
 pub(crate) struct Word {
     pub(crate) word: String,
-    pub(crate) letters: HashMap<char, u16>
+    pub(crate) letters: HashMap<char, u16>,
 }
-
 
 impl Word {
     pub(crate) fn new(word: &str) -> Self {
-        let word = word.chars().filter(|c| c.is_alphabetic() || c == &'-').collect::<String>();
-        let hashable = unidecode(&word).chars().filter(|c| !(c == &'-')).collect::<String>();
+        let word = word
+            .chars()
+            .filter(|c| c.is_alphabetic() || c == &'-')
+            .collect::<String>();
+        let hashable = unidecode(&word)
+            .chars()
+            .filter(|c| !(c == &'-'))
+            .collect::<String>();
         Self {
             letters: hashable.to_hashmap(),
             word,
-        } 
+        }
     }
 
     #[inline]
@@ -31,7 +35,6 @@ impl Word {
         self.word.len()
     }
 }
-
 
 #[cfg(test)]
 mod tests {

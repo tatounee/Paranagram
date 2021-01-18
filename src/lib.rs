@@ -32,6 +32,7 @@ impl Paranagram {
         let mut buffer = String::new();
         file.read_to_string(&mut buffer)?;
 
+        let mut words_len = 0;
 
         // Parse the content of the data file to create a vec of all Word
         let mut words = buffer
@@ -39,18 +40,34 @@ impl Paranagram {
             .filter_map(|s| {
                 let s = s.trim_end().to_owned();
                 if s.len() != 0 {
+                    words_len += 1;
                     Some(Word::new(&s[..]))
                 } else {
                     None
                 }
-
             })
-            .collect();
+            .collect::<Vec<Word>>();
+
+        let mut sacamot = vec![];
+
+        let mut len = 1;
+        loop {
+            if words_len == 0 {
+                break;
+            }
+            let (same_len, new_words) = words.into_iter().partition(|x| x.word.len() == len);
+            words = new_words;
+
+            words_len -= same_len.len();
+            sacamot.push((len, same_len));
+
+            len += 1;
+        }
 
         // Return our Paranagram
         Ok(Self {
             path_data: path_data.to_owned(),
-            sacamot
+            sacamot,
         })
     }
 
