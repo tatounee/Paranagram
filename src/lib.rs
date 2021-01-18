@@ -93,6 +93,10 @@ impl fmt::Debug for Paranagram {
         // We don't print the field "sacamot" because it's too large an uninteresting
         f.debug_struct("Paranagram")
             .field("path_data", &self.path_data)
+            .field(
+                "sacamot_len",
+                &self.sacamot.iter().map(|x| x.1.len()).sum::<usize>(),
+            )
             .finish()
     }
 }
