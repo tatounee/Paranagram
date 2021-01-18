@@ -3,7 +3,9 @@
 #![allow(unused_variables)]
 #![allow(unused_mut)]
 
+mod utils;
 
+use utils::*;
 
 use std::fmt;
 use std::fs::File;
