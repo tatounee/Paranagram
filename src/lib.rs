@@ -37,7 +37,7 @@ impl Paranagram {
 
         // Parse the content of the data file to create an vec of all word
         let mut sacamot: Vec<String> = buffer
-            .split("\n")
+            .lines()
             .filter_map(|s| {
                 if s.len() > max_len {
                     max_len = s.len()
