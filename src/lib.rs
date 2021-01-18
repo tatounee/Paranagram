@@ -71,17 +71,21 @@ impl Paranagram {
         })
     }
 
-    fn existing_anagrams(&self, sentence: &str) -> Vec<&String> {
-        let trie = Trie::new_with_iter_and_maximun_deep(sentence.chars(), min(self.max_len, PARANAGRAM_MAX_DEEP));
-        self.sacamot.iter().flat_map(|word| {
-            if trie.existing(word.chars()) {
-                Some(word)
-            } else {
-                None
+    pub fn existing_anagrams(&self, sentence: &str) -> Vec<String> {
+        let sentence = Word::new(sentence);
+        let mut anagrams = Vec::new();
+        for (len, sac) in self.sacamot.iter() {
+            if len > &sentence.len() {
+                continue;
             }
-        }).collect::<Vec<&String>>()
+            for w in sac.iter() {
+                if sentence.contains(w) {
+                    anagrams.push(w.word.to_owned())
+                }
+            }
+        }
+        anagrams
     }
-
 }
 
 impl fmt::Debug for Paranagram {
