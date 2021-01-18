@@ -14,10 +14,6 @@ use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 use std::path::Path;
-use std::str;
-use std::cmp::min;
-
-const PARANAGRAM_MAX_DEEP: usize = 10;
 
 pub struct Paranagram {
     path_data: String,
