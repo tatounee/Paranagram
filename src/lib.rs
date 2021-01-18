@@ -4,8 +4,10 @@
 #![allow(unused_mut)]
 
 mod utils;
+mod word;
 
 use utils::*;
+use word::Word;
 
 use std::fmt;
 use std::fs::File;
