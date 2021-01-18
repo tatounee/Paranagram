@@ -21,7 +21,7 @@ const PARANAGRAM_MAX_DEEP: usize = 10;
 
 pub struct Paranagram {
     path_data: String,
-    sacamot: Vec<String>,
+    sacamot: Vec<(usize, Vec<Word>)>,
 }
 
 impl Paranagram {
@@ -33,13 +33,13 @@ impl Paranagram {
         file.read_to_string(&mut buffer)?;
 
 
-        // Parse the content of the data file to create an vec of all word
-        let mut sacamot: Vec<String> = buffer
+        // Parse the content of the data file to create a vec of all Word
+        let mut words = buffer
             .lines()
             .filter_map(|s| {
                 let s = s.trim_end().to_owned();
                 if s.len() != 0 {
-                    Some(s)
+                    Some(Word::new(&s[..]))
                 } else {
                     None
                 }
@@ -50,7 +50,7 @@ impl Paranagram {
         // Return our Paranagram
         Ok(Self {
             path_data: path_data.to_owned(),
-            sacamot,
+            sacamot
         })
     }
 
