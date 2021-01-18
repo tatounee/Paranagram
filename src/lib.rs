@@ -104,18 +104,23 @@ impl fmt::Debug for Paranagram {
 #[cfg(test)]
 mod test {
     use super::*;
+    use std::time::Instant;
 
     #[test]
+    #[ignore]
     fn init() {
+        let start = Instant::now();
         let paranagram = Paranagram::new("data/word.txt");
-        println!("{:?}", paranagram);
+        println!("{:?} in {:?}", paranagram, start.elapsed());
     }
 
     #[test]
     fn find_all_anagram_of_a_word() {
-        let word = "Jean le parisien";
+        let word = "Les parisiennes sont trés jolies";
         let paranagram = Paranagram::new("data/word.txt").unwrap();
+        let instant = Instant::now();
         let anagrams = paranagram.existing_anagrams(word);
         println!("{:?}", anagrams);
+        println!("{:?}", instant.elapsed());
     }
 }
