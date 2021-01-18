@@ -3,9 +3,7 @@
 #![allow(unused_variables)]
 #![allow(unused_mut)]
 
-mod trie;
 
-use trie::Trie;
 
 use std::fmt;
 use std::fs::File;
