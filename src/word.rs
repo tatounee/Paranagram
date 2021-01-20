@@ -3,7 +3,9 @@ use crate::{hashmap, utils::*};
 use std::collections::HashMap;
 use unidecode::unidecode;
 
-#[derive(Debug)]
+use std::fmt;
+
+// #[derive(Debug)]
 pub struct Word {
     word: String,
     len: usize,
@@ -52,6 +54,20 @@ impl Word {
     pub(crate) fn new_perso(word: String, len: usize, weight: usize, letters: HashMap<char, u16>) -> Self {
         Self{word, len, weight, letters}
     }
+}
+
+impl fmt::Debug for Word {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Word")
+            .field("len", &self.len)
+            .field("weight", &self.weight)
+            .finish()
+    }
+}
+
+impl fmt::Display for Word {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.word)
     }
 }
 
