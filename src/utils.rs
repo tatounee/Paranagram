@@ -87,12 +87,6 @@ mod tests {
     }
 
     #[test]
-    fn str_with_len_of_100() {
-        let start = Instant::now();
-        "abcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghij".to_hashmap();
-        // println!("str_with_len_of_100 : {:?}", start.elapsed());
-    }
-    #[test]
     fn str_with_all_letter() {
         let start = Instant::now();
         "abcdefghijklmnopqrstuvwxuyz".to_hashmap();
