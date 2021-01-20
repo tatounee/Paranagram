@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use unidecode::unidecode;
 
 #[derive(Debug)]
-pub(crate) struct Word {
+pub struct Word {
     word: String,
     len: usize,
     weight: usize,
