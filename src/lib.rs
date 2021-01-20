@@ -111,12 +111,13 @@ mod test {
     }
 
     #[test]
-    fn find_all_anagram_of_a_word() {
-        let word = "Les parisiennes sont trés jolies";
+    #[ignore]
+    fn find_all_anagram_of_a_sentence() {
+        let word = Word::new("Les parisiennes sont très jolies");
         let paranagram = Paranagram::new("data/word.txt").unwrap();
         let instant = Instant::now();
-        let anagrams = paranagram.existing_anagrams(word);
-        println!("{:?}", anagrams);
+        let anagrams = paranagram.existing_anagrams(&word);
+        assert_eq!(anagrams.len(), 14005);
         println!("{:?}", instant.elapsed());
     }
 }
