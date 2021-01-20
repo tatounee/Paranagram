@@ -18,6 +18,7 @@ use std::collections::HashMap;
 
 use rayon::prelude::*;
 
+use std::time::Instant;
 
 pub struct Paranagram {
     path_data: String,
@@ -69,8 +70,15 @@ impl Paranagram {
     }
 
     pub fn generate_anagrams(&self, sentence: &Word) -> Vec<Vec<&Word>> {
+        let instant = Instant::now();
         let anagrams = self.existing_anagrams(sentence);
+        println!("0 - {:?}", instant.elapsed());
+        let instant = Instant::now();
+
         let combination = find_sum(anagrams.into_iter(), sentence.weight(), vec![]);
+        println!("1 - {:?}", instant.elapsed());
+        let instant = Instant::now();
+
         combination.into_par_iter().filter_map(|c| {
             if &c.iter().fold(HashMap::new(), |mut acc, w| {
                 acc.merge(w.letters());
@@ -100,7 +108,6 @@ impl fmt::Debug for Paranagram {
 #[cfg(test)]
 mod test {
     use super::*;
-    use std::time::Instant;
 
     #[test]
     #[ignore]
@@ -108,6 +115,7 @@ mod test {
         let start = Instant::now();
         let paranagram = Paranagram::new("data/word.txt");
         println!("{:?} in {:?}", paranagram, start.elapsed());
+        println!("{:?}", paranagram.unwrap().sacamot[0]);
     }
 
     #[test]
@@ -119,5 +127,42 @@ mod test {
         let anagrams = paranagram.existing_anagrams(&word);
         assert_eq!(anagrams.len(), 14005);
         println!("{:?}", instant.elapsed());
+    }
+
+    #[test]
+    fn find_all_anagramed_sentence_of_a_sentence() {
+        let word = Word::new("Les parisiennes sont très jolies");
+        let start = Instant::now();
+        let paranagram = Paranagram::new("data/word.txt").unwrap();
+        let middle = Instant::now();
+        let anagrams = paranagram.generate_anagrams(&word);
+        let end = Instant::now();
+
+        let mut buffer = String::new();
+        anagrams.iter().for_each(|v| {
+            for w in v.iter() {
+                buffer.push_str(&format!("{} ", w))
+            }
+            buffer.push('\n');
+        });
+        buffer.push_str(&format!("len: {}", anagrams.len()));
+        buffer.push_str(&format!("[{:?}] {:?} + {:?}", end - start, middle - start, end - middle));
+
+        let path = Path::new("paranagram.txt");
+        let display = path.display();
+    
+        // Open a file in write-only mode, returns `io::Result<File>`
+        let mut file = match File::create(&path) {
+            Err(why) => panic!("couldn't create {}: {}", display, why),
+            Ok(file) => file,
+        };
+    
+        // Write the `LOREM_IPSUM` string to `file`, returns `io::Result<()>`
+        match file.write_all(buffer.as_bytes()) {
+            Err(why) => panic!("couldn't write to {}: {}", display, why),
+            Ok(_) => println!("successfully wrote to {}", display),
+        }
+
+
     }
 }
