@@ -20,13 +20,22 @@ impl Word {
             .chars()
             .filter(|c| c.is_alphabetic() || c == &'-')
             .collect::<String>();
-        let hashable = unidecode(&word)
+
+        let letters = unidecode(&word)
             .chars()
             .filter(|c| !(c == &'-'))
-            .collect::<String>();
+            .map(|c| c.to_ascii_lowercase())
+            .collect::<String>().to_hashmap();
+        
+        let weight = letters.iter().map(|(k, v)| {
+            ((*k as u8 - 96) as u16 * *v) as usize
+        }).sum::<usize>();
+
         Self {
-            letters: hashable.to_hashmap(),
+            len: unidecode(&word).len(),
             word,
+            weight,
+            letters,
         }
     }
 
