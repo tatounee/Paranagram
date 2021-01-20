@@ -33,6 +33,11 @@ impl Word {
     #[inline]
     pub(crate) fn len(&self) -> usize {
         self.word.len()
+
+    #[cfg(test)]
+    pub(crate) fn new_perso(word: String, len: usize, weight: usize, letters: HashMap<char, u16>) -> Self {
+        Self{word, len, weight, letters}
+    }
     }
 }
 

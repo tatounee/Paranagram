@@ -56,6 +56,20 @@ macro_rules! hashmap {
     };
 }
 
+#[macro_export]
+macro_rules! vec_word_weight {
+    ($($w:expr),* ) => {
+        {
+            let mut vec = Vec::new();
+            $(
+                vec.push(Word::new_perso(String::new(), 0, $w, HashMap::new()));
+            )*
+            vec
+        }
+    };
+}
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
