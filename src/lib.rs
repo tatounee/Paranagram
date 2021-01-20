@@ -17,7 +17,7 @@ use std::path::Path;
 
 pub struct Paranagram {
     path_data: String,
-    sacamot: Vec<(usize, Vec<Word>)>,
+    sacamot: Vec<Word>,
 }
 
 impl Paranagram {
@@ -31,7 +31,7 @@ impl Paranagram {
         let mut words_len = 0;
 
         // Parse the content of the data file to create a vec of all Word
-        let mut words = buffer
+        let mut sacamot = buffer
             .lines()
             .filter_map(|s| {
                 let s = s.trim_end().to_owned();
@@ -44,22 +44,6 @@ impl Paranagram {
             })
             .collect::<Vec<Word>>();
 
-        let mut sacamot = vec![];
-
-        let mut len = 1;
-        loop {
-            if words_len == 0 {
-                break;
-            }
-            let (same_len, new_words) = words.into_iter().partition(|x| x.word.len() == len);
-            words = new_words;
-
-            words_len -= same_len.len();
-            sacamot.push((len, same_len));
-
-            len += 1;
-        }
-
         // Return our Paranagram
         Ok(Self {
             path_data: path_data.to_owned(),
@@ -67,20 +51,18 @@ impl Paranagram {
         })
     }
 
-    pub fn existing_anagrams(&self, sentence: &str) -> Vec<String> {
-        let sentence = Word::new(sentence);
-        let mut anagrams = Vec::new();
-        for (len, sac) in self.sacamot.iter() {
-            if len > &sentence.len() {
-                continue;
+    fn existing_anagrams(&self, sentence: &Word) -> Vec<&Word> {
+        self.sacamot.par_iter().filter_map(|word| {
+            if word.len() > sentence.len() {
+                return None;
             }
-            for w in sac.iter() {
-                if sentence.contains(w) {
-                    anagrams.push(w.word.to_owned())
-                }
+            if sentence.contains(word) {
+                Some(word)
+            } else {
+                None
             }
-        }
-        anagrams
+        }).collect()
+    }
     }
 }
 
@@ -91,7 +73,7 @@ impl fmt::Debug for Paranagram {
             .field("path_data", &self.path_data)
             .field(
                 "sacamot_len",
-                &self.sacamot.iter().map(|x| x.1.len()).sum::<usize>(),
+                &self.sacamot.len(),
             )
             .finish()
     }
