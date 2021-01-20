@@ -15,11 +15,11 @@ impl IntoHashMap<char, u16> for &str {
     }
 }
 
-pub(crate) trait HashMapContainsHashMap<K, V> {
+pub(crate) trait HashMapUtils<K, V> {
     fn contains(&self, other: &HashMap<K, V>) -> bool;
 }
 
-impl HashMapContainsHashMap<char, u16> for HashMap<char, u16> {
+impl HashMapUtils<char, u16> for HashMap<char, u16> {
     fn contains(&self, other: &HashMap<char, u16>) -> bool {
         for (key, val) in other.iter() {
             if self.contains_key(key) == false {
