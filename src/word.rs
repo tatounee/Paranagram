@@ -97,4 +97,31 @@ mod tests {
         assert_eq!(w.word, "a-a");
         assert_eq!(w.letters, hashmap!['a' => 2])
     }
+
+    #[test]
+    fn len_unidecode() {
+        let a = Word::new("à");
+        assert_eq!(a.len(), 1);
+    }
+
+    #[test]
+    fn weight_char() {
+        "abcdefghijklmnopqrstuvwxyz".chars().enumerate().for_each(|(i, c)| {
+            let mut b = [0; 2];
+            let s = c.encode_utf8(&mut b);
+            assert_eq!(Word::new(s).weight(), i + 1);
+        });
+    }
+
+    #[test]
+    fn weight_word_with_unique_chars() {
+        let w = Word::new("abcde");
+        assert_eq!(w.weight(), 15);
+    }    
+    
+    #[test]
+    fn weight_word_with_multiple_chars() {
+        let w = Word::new("aàbcdee");
+        assert_eq!(w.weight(), 21);
+    }
 }
