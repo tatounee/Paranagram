@@ -17,6 +17,7 @@ impl IntoHashMap<char, u16> for &str {
 
 pub(crate) trait HashMapUtils<K, V> {
     fn contains(&self, other: &HashMap<K, V>) -> bool;
+    fn merge(&mut self, other: &HashMap<K, V>);
 }
 
 impl HashMapUtils<char, u16> for HashMap<char, u16> {
@@ -31,6 +32,15 @@ impl HashMapUtils<char, u16> for HashMap<char, u16> {
         }
         true
     }
+
+    fn merge(&mut self, other: &HashMap<char, u16>) {
+        for (key, val) in other.iter() {
+            let entry = self.entry(*key).or_insert(0);
+            *entry += val
+        }
+
+    }
+}
 }
 
 #[macro_export]
