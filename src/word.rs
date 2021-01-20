@@ -36,7 +36,6 @@ impl Word {
 
     #[inline]
     pub(crate) fn len(&self) -> usize {
-        self.word.len()
         self.len
     }
     
