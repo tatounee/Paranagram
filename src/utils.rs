@@ -41,6 +41,36 @@ impl HashMapUtils<char, u16> for HashMap<char, u16> {
 
     }
 }
+use crate::word::Word;
+
+use std::cmp::Ordering;
+
+// TODO: Add multitheading for this part
+pub(crate) fn find_sum<'a, I>(mut data: I, goal: usize, floor: Vec<&'a Word>) -> Vec<Vec<&Word>>
+where
+    I: Iterator<Item=&'a Word> + Clone
+    {
+    let mut buffer = vec![];
+    let floor_sum = floor.iter().map(|w| w.weight()).sum::<usize>();
+
+    // Here
+    while let Some(number) = data.next() {
+        match (number.weight() + floor_sum).cmp(&goal) {
+            Ordering::Equal => {
+                let mut v = vec![number];
+                v.extend_from_slice(&floor);
+                buffer.push(v)
+            }
+            Ordering::Less => {
+                let mut v = vec![number];
+                v.extend_from_slice(&floor);
+                // Or Here
+                find_sum(data.clone(), goal, v).into_iter().for_each(|v| buffer.push(v))
+            }
+            _ => {}
+        }
+    }
+    buffer
 }
 
 #[macro_export]
