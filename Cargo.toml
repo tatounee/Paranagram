@@ -9,3 +9,7 @@ edition = "2018"
 [dependencies]
 unidecode = "0.3.0"
 rayon = "1.5.0"
+
+[profile.test]
+opt-level = 3
+lto = true
