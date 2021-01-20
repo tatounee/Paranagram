@@ -14,6 +14,10 @@ use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 use std::path::Path;
+use std::collections::HashMap;
+
+use rayon::prelude::*;
+
 
 pub struct Paranagram {
     path_data: String,
@@ -63,6 +67,20 @@ impl Paranagram {
             }
         }).collect()
     }
+
+    pub fn generate_anagrams(&self, sentence: &Word) -> Vec<Vec<&Word>> {
+        let anagrams = self.existing_anagrams(sentence);
+        let combination = find_sum(anagrams.into_iter(), sentence.weight(), vec![]);
+        combination.into_par_iter().filter_map(|c| {
+            if &c.iter().fold(HashMap::new(), |mut acc, w| {
+                acc.merge(w.letters());
+                acc
+            }) == sentence.letters() {
+                Some(c)
+            } else {
+                None
+            }
+        }).collect::<Vec<Vec<&Word>>>()
     }
 }
 
