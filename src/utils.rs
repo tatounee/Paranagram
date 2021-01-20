@@ -41,6 +41,7 @@ impl HashMapUtils<char, u16> for HashMap<char, u16> {
 
     }
 }
+
 use crate::word::Word;
 
 use std::cmp::Ordering;
@@ -136,5 +137,30 @@ mod tests {
         assert!(hm2.contains(&hm1));
         assert!(!hm1.contains(&hm2));
         assert!(hm1.contains(&hm1));
+    }
+
+    #[test]
+    fn little_data() {
+        let start = Instant::now();
+        let data = vec_word_weight![10, 5, 3, 7, 5, 2, 1]; // (10) (7, 3) (7, 2, 1) (5, 5) (5, 3, 2)
+        let x = find_sum(data.iter(), 10, vec![]);
+        // println!("{:?}", x);
+        // println!("{:?}", start.elapsed());
+    }
+
+    #[test]
+    fn merge_existing_key() {
+        let mut hm1 = hashmap!['a' => 2, 'b' => 1];
+        let hm2 = hashmap!['a' => 3, 'b' => 1];
+        hm1.merge(&hm2);
+        assert_eq!(hm1, hashmap!['a' => 5, 'b' => 2])
+    }    
+    
+    #[test]
+    fn merge_with_new_key() {
+        let mut hm1 = hashmap!['a' => 2, 'b' => 1];
+        let hm2 = hashmap!['a' => 3, 'b' => 1, 'c' => 2];
+        hm1.merge(&hm2);
+        assert_eq!(hm1, hashmap!['a' => 5, 'b' => 2, 'c' => 2])
     }
 }
