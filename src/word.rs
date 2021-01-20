@@ -5,8 +5,8 @@ use unidecode::unidecode;
 
 #[derive(Debug)]
 pub(crate) struct Word {
-    pub(crate) word: String,
-    pub(crate) letters: HashMap<char, u16>,
+    word: String,
+    letters: HashMap<char, u16>,
 }
 
 impl Word {
@@ -33,6 +33,9 @@ impl Word {
     #[inline]
     pub(crate) fn len(&self) -> usize {
         self.word.len()
+    pub(crate) fn letters(&self) -> &HashMap<char, u16> {
+        &self.letters
+    }
 
     #[cfg(test)]
     pub(crate) fn new_perso(word: String, len: usize, weight: usize, letters: HashMap<char, u16>) -> Self {
