@@ -1,4 +1,3 @@
-
 use crate::{hashmap, utils::*};
 
 use unidecode::unidecode;
@@ -25,11 +24,13 @@ impl Word {
             .chars()
             .filter(|c| !(c == &'-'))
             .map(|c| c.to_ascii_lowercase())
-            .collect::<String>().to_hashmap();
-        
-        let weight = letters.iter().map(|(k, v)| {
-            ((*k as u8 - 96) as u16 * *v) as usize
-        }).sum::<usize>();
+            .collect::<String>()
+            .to_hashmap();
+
+        let weight = letters
+            .iter()
+            .map(|(k, v)| ((*k as u8 - 96) as u16 * *v) as usize)
+            .sum::<usize>();
 
         Self {
             len: unidecode(&word).len(),
@@ -48,12 +49,12 @@ impl Word {
     pub(crate) fn len(&self) -> usize {
         self.len
     }
-    
+
     #[inline]
     pub(crate) fn weight(&self) -> usize {
         self.weight
-    }   
-    
+    }
+
     #[inline]
     pub(crate) fn letters(&self) -> &HashMap<char, u16> {
         &self.letters
