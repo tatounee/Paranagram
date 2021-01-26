@@ -42,10 +42,37 @@ impl HashMapUtils<char, u16> for HashMap<char, u16> {
             let entry = self.entry(*key).or_insert(0);
             *entry += val
         }
-
     }
 }
 
+pub trait ToTupleIndex {
+    fn to_tuple_index(&self) -> Vec<(usize, usize)>;
+}
+
+pub trait FromTupleIndex {
+    fn from_tuple_index(&self, tuple: Vec<(usize, usize)>) -> Self;
+}
+
+impl ToTupleIndex for Vec<&Word> {
+    #[inline]
+    fn to_tuple_index(&self) -> Vec<(usize, usize)> {
+        self.iter()
+            .enumerate()
+            .map(|(i, w)| (i, w.weight()))
+            .collect()
+    }
+}
+
+impl FromTupleIndex for Vec<&Word> {
+    #[inline]
+    fn from_tuple_index(&self, tuple: Vec<(usize, usize)>) -> Self {
+        tuple.iter().map(|x| *self.get(x.0).unwrap()).collect()
+    }
+}
+
+pub trait Extract {
+    fn extract(&self) -> usize;
+}
 
 
 // TODO: Add multitheading for this part
