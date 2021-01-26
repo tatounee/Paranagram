@@ -74,34 +74,103 @@ pub trait Extract {
     fn extract(&self) -> usize;
 }
 
+impl Extract for (usize, usize) {
+    fn extract(&self) -> usize {
+        self.1
+    }
+}
 
 // TODO: Add multitheading for this part
-pub(crate) fn find_sum<'a, I>(mut data: I, goal: usize, floor: Vec<&'a Word>) -> Vec<Vec<&Word>>
-where
-    I: Iterator<Item=&'a Word> + Clone
+#[inline]
+pub fn find_sum(mut data: Vec<(usize, usize)>, goal: usize) -> Vec<Vec<(usize, usize)>> {
+    data.sort_unstable_by(|a, b| a.extract().cmp(&b.extract()));
+    let data1 = data.into_iter().enumerate().rev();
     {
-    let mut buffer = vec![];
-    let floor_sum = floor.iter().map(|w| w.weight()).sum::<usize>();
+        let mut data = data1;
+        let goal = goal;
+        let rest = 0;
+        let floor: Vec<(usize, usize)> = vec![];
+        let mut buffer = vec![];
+        let floor_sum = floor.iter().map(|x| x.extract()).sum::<usize>();
+        let mut thread_vec = Vec::new();
+        while let Some((index, number)) = data.next() {
+            println!("{}", index);
+            match (number.extract() + floor_sum).cmp(&goal) {
+                Ordering::Equal => {
+                    let mut v = vec![number];
+                    v.extend_from_slice(&floor);
+                    buffer.push(v)
+                }
+                Ordering::Less => {
+                    if (index + 1) * number.extract() < rest {
+                        break;
+                    }
+                    let mut v = vec![number];
+                    let cloned_data = data.clone();
+                    v.extend_from_slice(&floor);
+                    let th = thread::spawn(move || {
+                        find_sum_rec(
+                            cloned_data,
+                            goal,
+                            goal - floor_sum - number.extract(),
+                            v,
+                        )
+                    });
+                    thread_vec.push(th);
+                }
+            
+                Ordering::Greater => {}
+            }
+        }
+        for t in thread_vec {
+            buffer.append(&mut t.join().unwrap())
+        }
+        buffer
+    }
+}
 
-    // Here
-    while let Some(number) = data.next() {
-        match (number.weight() + floor_sum).cmp(&goal) {
+pub fn find_sum_rec<I>(
+    mut data: I,
+    goal: usize,
+    rest: usize,
+    floor: Vec<(usize, usize)>,
+) -> Vec<Vec<(usize, usize)>>
+where
+    I: Iterator<Item = (usize, (usize, usize))> + Clone + Send + Sync,
+{
+    let mut buffer = vec![];
+    let floor_sum = floor.iter().map(|x| x.extract()).sum::<usize>();
+
+   // let mut thread_vec = Vec::new();
+
+    while let Some((index, number)) = data.next() {
+        match (number.extract() + floor_sum).cmp(&goal) {
             Ordering::Equal => {
                 let mut v = vec![number];
                 v.extend_from_slice(&floor);
                 buffer.push(v)
             }
             Ordering::Less => {
+                if (index + 1) * number.extract() < rest {
+                    break;
+                }
                 let mut v = vec![number];
                 v.extend_from_slice(&floor);
-                // Or Here
-                find_sum(data.clone(), goal, v).into_iter().for_each(|v| buffer.push(v))
+                find_sum_rec(
+                    data.clone(),
+                    goal,
+                    goal - floor_sum - number.extract(),
+                    v,
+                ).into_iter().for_each(|x| buffer.push(x))
             }
-            _ => {}
+
+            Ordering::Greater => {}
         }
     }
     buffer
 }
+
+
 
 #[macro_export]
 macro_rules! hashmap {
@@ -128,7 +197,6 @@ macro_rules! vec_word_weight {
         }
     };
 }
-
 
 #[cfg(test)]
 mod tests {
