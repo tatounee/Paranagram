@@ -57,16 +57,19 @@ impl Paranagram {
     }
 
     fn existing_anagrams(&self, sentence: &Word) -> Vec<&Word> {
-        self.sacamot.par_iter().filter_map(|word| {
-            if word.len() > sentence.len() {
-                return None;
-            }
-            if sentence.contains(word) {
-                Some(word)
-            } else {
-                None
-            }
-        }).collect()
+        self.sacamot
+            .par_iter()
+            .filter_map(|word| {
+                if word.len() > sentence.len() {
+                    return None;
+                }
+                if sentence.contains(word) {
+                    Some(word)
+                } else {
+                    None
+                }
+            })
+            .collect()
     }
 
     pub fn generate_anagrams(&self, sentence: &Word) -> Vec<Vec<&Word>> {
