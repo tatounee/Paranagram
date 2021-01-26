@@ -9,12 +9,12 @@ mod word;
 use utils::*;
 use word::Word;
 
+use std::collections::HashMap;
 use std::fmt;
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 use std::path::Path;
-use std::collections::HashMap;
 
 use rayon::prelude::*;
 
