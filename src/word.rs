@@ -60,8 +60,18 @@ impl Word {
     }
 
     #[cfg(test)]
-    pub(crate) fn new_perso(word: String, len: usize, weight: usize, letters: HashMap<char, u16>) -> Self {
-        Self{word, len, weight, letters}
+    pub(crate) fn new_perso(
+        word: String,
+        len: usize,
+        weight: usize,
+        letters: HashMap<char, u16>,
+    ) -> Self {
+        Self {
+            word,
+            len,
+            weight,
+            letters,
+        }
     }
 }
 
