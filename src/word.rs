@@ -106,19 +106,22 @@ mod tests {
 
     #[test]
     fn weight_char() {
-        "abcdefghijklmnopqrstuvwxyz".chars().enumerate().for_each(|(i, c)| {
-            let mut b = [0; 2];
-            let s = c.encode_utf8(&mut b);
-            assert_eq!(Word::new(s).weight(), i + 1);
-        });
+        "abcdefghijklmnopqrstuvwxyz"
+            .chars()
+            .enumerate()
+            .for_each(|(i, c)| {
+                let mut b = [0; 2];
+                let s = c.encode_utf8(&mut b);
+                assert_eq!(Word::new(s).weight(), i + 1);
+            });
     }
 
     #[test]
     fn weight_word_with_unique_chars() {
         let w = Word::new("abcde");
         assert_eq!(w.weight(), 15);
-    }    
-    
+    }
+
     #[test]
     fn weight_word_with_multiple_chars() {
         let w = Word::new("aàbcdee");

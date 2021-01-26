@@ -140,10 +140,18 @@ mod tests {
     }
 
     #[test]
-    fn little_data() {
-        let start = Instant::now();
-        let data = vec_word_weight![10, 5, 3, 7, 5, 2, 1]; // (10) (7, 3) (7, 2, 1) (5, 5) (5, 3, 2)
-        let x = find_sum(data.iter(), 10, vec![]);
+    fn little_data_tuple() {
+        // let start = Instant::now();
+        let data: Vec<(usize, usize)> = vec![
+            (100, 10),
+            (50, 5),
+            (30, 3),
+            (70, 7),
+            (50, 5),
+            (20, 2),
+            (10, 1),
+        ]; // (10) (7, 3) (7, 2, 1) (5, 5) (5, 3, 2)
+        // let x = find_sum_tuple(data.into_iter(), 10, vec![]);
         // println!("{:?}", x);
         // println!("{:?}", start.elapsed());
     }
@@ -154,8 +162,8 @@ mod tests {
         let hm2 = hashmap!['a' => 3, 'b' => 1];
         hm1.merge(&hm2);
         assert_eq!(hm1, hashmap!['a' => 5, 'b' => 2])
-    }    
-    
+    }
+
     #[test]
     fn merge_with_new_key() {
         let mut hm1 = hashmap!['a' => 2, 'b' => 1];

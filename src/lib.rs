@@ -131,7 +131,7 @@ mod test {
 
     #[test]
     fn find_all_anagramed_sentence_of_a_sentence() {
-        let word = Word::new("Les parisiennes sont très jolies");
+        let word = Word::new("les parisiennes");
         let start = Instant::now();
         let paranagram = Paranagram::new("data/word.txt").unwrap();
         let middle = Instant::now();
@@ -146,23 +146,26 @@ mod test {
             buffer.push('\n');
         });
         buffer.push_str(&format!("len: {}", anagrams.len()));
-        buffer.push_str(&format!("[{:?}] {:?} + {:?}", end - start, middle - start, end - middle));
+        buffer.push_str(&format!(
+            "[{:?}] {:?} + {:?}",
+            end - start,
+            middle - start,
+            end - middle
+        ));
 
         let path = Path::new("paranagram.txt");
         let display = path.display();
-    
+
         // Open a file in write-only mode, returns `io::Result<File>`
         let mut file = match File::create(&path) {
             Err(why) => panic!("couldn't create {}: {}", display, why),
             Ok(file) => file,
         };
-    
+
         // Write the `LOREM_IPSUM` string to `file`, returns `io::Result<()>`
         match file.write_all(buffer.as_bytes()) {
             Err(why) => panic!("couldn't write to {}: {}", display, why),
             Ok(_) => println!("successfully wrote to {}", display),
         }
-
-
     }
 }
