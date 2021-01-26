@@ -73,25 +73,36 @@ impl Paranagram {
     }
 
     pub fn generate_anagrams(&self, sentence: &Word) -> Vec<Vec<&Word>> {
-        let instant = Instant::now();
+            let instant = Instant::now();
         let anagrams = self.existing_anagrams(sentence);
-        println!("0 - {:?}", instant.elapsed());
-        let instant = Instant::now();
+            println!("0 - {:?}", instant.elapsed());
+            let instant = Instant::now();
+        let mut tuple_anagrams = anagrams.to_tuple_index();
+            println!("1 - {:?}, len: {}", instant.elapsed(), tuple_anagrams.len());
+            let instant = Instant::now();
+        let combination = find_sum(tuple_anagrams, sentence.weight());
+            println!("2 - {:?}", instant.elapsed());
+            let instant = Instant::now();
+        let combination = combination
+            .into_iter()
+            .map(|x| anagrams.from_tuple_index(x))
+            .collect::<Vec<Vec<&Word>>>();
+        println!("3 - {:?}", instant.elapsed());
 
-        let combination = find_sum(anagrams.into_iter(), sentence.weight(), vec![]);
-        println!("1 - {:?}", instant.elapsed());
-        let instant = Instant::now();
-
-        combination.into_par_iter().filter_map(|c| {
-            if &c.iter().fold(HashMap::new(), |mut acc, w| {
-                acc.merge(w.letters());
-                acc
-            }) == sentence.letters() {
-                Some(c)
-            } else {
-                None
-            }
-        }).collect::<Vec<Vec<&Word>>>()
+        combination
+            .into_par_iter()
+            .filter_map(|c| {
+                if &c.iter().fold(HashMap::new(), |mut acc, w| {
+                    acc.merge(w.letters());
+                    acc
+                }) == sentence.letters()
+                {
+                    Some(c)
+                } else {
+                    None
+                }
+            })
+            .collect::<Vec<Vec<&Word>>>()
     }
 }
 
