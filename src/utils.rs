@@ -1,4 +1,8 @@
+use crate::word::{self, Word};
+
+use std::cmp::Ordering;
 use std::collections::HashMap;
+use std::thread;
 
 pub(crate) trait IntoHashMap<K, V> {
     fn to_hashmap(self) -> HashMap<K, V>;
@@ -42,9 +46,7 @@ impl HashMapUtils<char, u16> for HashMap<char, u16> {
     }
 }
 
-use crate::word::Word;
 
-use std::cmp::Ordering;
 
 // TODO: Add multitheading for this part
 pub(crate) fn find_sum<'a, I>(mut data: I, goal: usize, floor: Vec<&'a Word>) -> Vec<Vec<&Word>>
