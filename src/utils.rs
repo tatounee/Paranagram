@@ -2,7 +2,9 @@ use crate::word::Word;
 
 use std::cmp::Ordering;
 use std::collections::HashMap;
+use std::sync::mpsc;
 use std::thread;
+use std::time::Duration;
 
 pub(crate) trait IntoHashMap<K, V> {
     fn to_hashmap(self) -> HashMap<K, V>;
@@ -70,54 +72,58 @@ impl FromTupleIndex for Vec<&Word> {
     }
 }
 
-pub(crate) fn find_sum(mut data: Vec<(usize, usize)>, goal: usize) -> Vec<Vec<(usize, usize)>> {
-
-
 #[inline]
-    data.sort_unstable_by(|a, b| a.extract().cmp(&b.extract()));
-    let data1 = data.into_iter().enumerate().rev();
-    {
-        let mut data = data1;
-        let goal = goal;
-        let rest = 0;
-        let floor: Vec<(usize, usize)> = vec![];
-        let mut buffer = vec![];
-        let floor_sum = floor.iter().map(|x| x.extract()).sum::<usize>();
-        let mut thread_vec = Vec::new();
-        while let Some((index, number)) = data.next() {
-            println!("{}", index);
-            match (number.extract() + floor_sum).cmp(&goal) {
-                Ordering::Equal => {
-                    let mut v = vec![number];
-                    v.extend_from_slice(&floor);
-                    buffer.push(v)
-                }
-                Ordering::Less => {
-                    if (index + 1) * number.extract() < rest {
-                        break;
-                    }
-                    let mut v = vec![number];
-                    let cloned_data = data.clone();
-                    v.extend_from_slice(&floor);
-                    let th = thread::spawn(move || {
-                        find_sum_rec(
-                            cloned_data,
-                            goal,
-                            goal - floor_sum - number.extract(),
-                            v,
-                        )
-                    });
-                    thread_vec.push(th);
-                }
-            
-                Ordering::Greater => {}
+pub(crate) fn find_sum(mut data: Vec<(usize, usize)>, goal: usize) -> Vec<Vec<(usize, usize)>> {
+    data.sort_unstable_by(|a, b| a.1.cmp(&b.1));
+    let mut data = data.into_iter().enumerate().rev();
+
+    let num_cpu = num_cpus::get();
+    let mut cpu_count = 0;
+    let (tx, rx) = mpsc::channel();
+
+    let mut combinaison = Vec::new();
+    let mut thread_vec = Vec::new();
+    let rest = 0;
+    let floor: Vec<(usize, usize)> = vec![];
+    let floor_sum = floor.iter().map(|x| x.1).sum::<usize>();
+    while let Some((index, number)) = data.next() {
+        while cpu_count == num_cpu {
+            if rx.try_recv().is_ok() {
+                cpu_count -= 1
             }
+            thread::sleep(Duration::from_millis(1));
         }
-        for t in thread_vec {
-            buffer.append(&mut t.join().unwrap())
+
+        match (number.1 + floor_sum).cmp(&goal) {
+            Ordering::Equal => {
+                let mut v = vec![number];
+                v.extend_from_slice(&floor);
+                combinaison.push(v)
+            }
+            Ordering::Less => {
+                if (index + 1) * number.1 < rest {
+                    break;
+                }
+                let mut v = vec![number];
+                let cloned_data = data.clone();
+                v.extend_from_slice(&floor);
+                let tx1 = mpsc::Sender::clone(&tx);
+                cpu_count += 1;
+                let th = thread::spawn(move || {
+                    let output = find_sum_rec(cloned_data, goal, goal - floor_sum - number.1, v);
+                    tx1.send(()).unwrap();
+                    output
+                });
+                thread_vec.push(th);
+            }
+
+            Ordering::Greater => {}
         }
-        buffer
     }
+    for t in thread_vec {
+        combinaison.append(&mut t.join().unwrap())
+    }
+    combinaison
 }
 
 fn find_sum_rec<I>(
