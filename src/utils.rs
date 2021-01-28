@@ -151,12 +151,9 @@ where
                 }
                 let mut v = vec![number];
                 v.extend_from_slice(&floor);
-                find_sum_rec(
-                    data.clone(),
-                    goal,
-                    goal - floor_sum - number.extract(),
-                    v,
-                ).into_iter().for_each(|x| buffer.push(x))
+                find_sum_rec(data.clone(), goal, goal - floor_sum - number.1, v)
+                    .into_iter()
+                    .for_each(|x| buffer.push(x))
             }
 
             Ordering::Greater => {}
