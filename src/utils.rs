@@ -45,11 +45,11 @@ impl HashMapUtils<char, u16> for HashMap<char, u16> {
     }
 }
 
-pub trait ToTupleIndex {
+pub(crate) trait ToTupleIndex {
     fn to_tuple_index(&self) -> Vec<(usize, usize)>;
 }
 
-pub trait FromTupleIndex {
+pub(crate) trait FromTupleIndex {
     fn from_tuple_index(&self, tuple: Vec<(usize, usize)>) -> Self;
 }
 
@@ -70,10 +70,10 @@ impl FromTupleIndex for Vec<&Word> {
     }
 }
 
+pub(crate) fn find_sum(mut data: Vec<(usize, usize)>, goal: usize) -> Vec<Vec<(usize, usize)>> {
 
 
 #[inline]
-pub fn find_sum(mut data: Vec<(usize, usize)>, goal: usize) -> Vec<Vec<(usize, usize)>> {
     data.sort_unstable_by(|a, b| a.extract().cmp(&b.extract()));
     let data1 = data.into_iter().enumerate().rev();
     {
@@ -120,7 +120,7 @@ pub fn find_sum(mut data: Vec<(usize, usize)>, goal: usize) -> Vec<Vec<(usize, u
     }
 }
 
-pub fn find_sum_rec<I>(
+fn find_sum_rec<I>(
     mut data: I,
     goal: usize,
     rest: usize,
