@@ -130,7 +130,7 @@ mod test {
 
     #[test]
     fn find_all_anagramed_sentence_of_a_sentence() {
-        let word = Word::new("les parisiennes");
+        let word = Word::new("parisiennes");
         let start = Instant::now();
         let paranagram = Paranagram::new("data/word.txt").unwrap();
         let middle = Instant::now();
@@ -144,7 +144,7 @@ mod test {
             }
             buffer.push('\n');
         });
-        buffer.push_str(&format!("len: {}", anagrams.len()));
+        buffer.push_str(&format!("len: {}\n", anagrams.len()));
         buffer.push_str(&format!(
             "[{:?}] {:?} + {:?}",
             end - start,
