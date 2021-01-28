@@ -40,22 +40,22 @@ impl Word {
     }
 
     #[inline]
-    pub(crate) fn contains(&self, word: &Word) -> bool {
+    pub fn contains(&self, word: &Word) -> bool {
         self.letters.contains(&word.letters)
     }
 
     #[inline]
-    pub(crate) fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.len
     }
 
     #[inline]
-    pub(crate) fn weight(&self) -> usize {
+    pub fn weight(&self) -> usize {
         self.weight
     }
 
     #[inline]
-    pub(crate) fn letters(&self) -> &HashMap<char, u16> {
+    pub fn letters(&self) -> &HashMap<char, u16> {
         &self.letters
     }
 }
