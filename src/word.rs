@@ -13,7 +13,7 @@ pub struct Word {
 }
 
 impl Word {
-    pub(crate) fn new(word: &str) -> Self {
+    pub fn new(word: &str) -> Self {
         let word = word
             .chars()
             .filter(|c| c.is_alphabetic() || c == &'-')
