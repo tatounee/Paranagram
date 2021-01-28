@@ -66,8 +66,9 @@ impl Paranagram {
             .collect()
     }
 
-    pub fn generate_anagrams(&self, sentence: &Word) -> Vec<Vec<&Word>> {
-        let anagrams = self.existing_anagrams(sentence);
+    pub fn generate_anagrams(&self, sentence: &str) -> Vec<Vec<&Word>> {
+        let sentence = Word::new(sentence);
+        let anagrams = self.existing_anagrams(&sentence);
         let tuple_anagrams = anagrams.to_tuple_index();
         let combination = find_sum(tuple_anagrams, sentence.weight());
         let combination = combination
@@ -130,11 +131,10 @@ mod test {
 
     #[test]
     fn find_all_anagramed_sentence_of_a_sentence() {
-        let word = Word::new("parisiennes");
         let start = Instant::now();
         let paranagram = Paranagram::new("data/word.txt").unwrap();
         let middle = Instant::now();
-        let anagrams = paranagram.generate_anagrams(&word);
+        let anagrams = paranagram.generate_anagrams("parisiennes");
         let end = Instant::now();
 
         let mut buffer = String::new();
