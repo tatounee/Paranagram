@@ -1,8 +1,8 @@
 
 mod utils;
-mod word;
-
 use utils::*;
+
+pub mod word;
 pub use word::Word;
 
 use std::collections::HashMap;
