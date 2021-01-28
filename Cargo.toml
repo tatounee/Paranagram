@@ -1,5 +1,5 @@
 [package]
-name = "paragram"
+name = "paranagram"
 version = "0.1.0"
 authors = ["T4toun3 <oettam32@gmail.com>"]
 edition = "2018"
