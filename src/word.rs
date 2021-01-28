@@ -1,11 +1,10 @@
-use crate::{hashmap, utils::*};
+use crate::utils::*;
 
 use unidecode::unidecode;
 
 use std::collections::HashMap;
 use std::fmt;
 
-// #[derive(Debug)]
 pub struct Word {
     word: String,
     len: usize,
@@ -22,7 +21,7 @@ impl Word {
 
         let letters = unidecode(&word)
             .chars()
-            .filter(|c| !(c == &'-'))
+            .filter(|c| c != &'-')
             .map(|c| c.to_ascii_lowercase())
             .collect::<String>()
             .to_hashmap();
@@ -59,21 +58,6 @@ impl Word {
     pub(crate) fn letters(&self) -> &HashMap<char, u16> {
         &self.letters
     }
-
-    #[cfg(test)]
-    pub(crate) fn new_perso(
-        word: String,
-        len: usize,
-        weight: usize,
-        letters: HashMap<char, u16>,
-    ) -> Self {
-        Self {
-            word,
-            len,
-            weight,
-            letters,
-        }
-    }
 }
 
 impl fmt::Debug for Word {
@@ -94,7 +78,7 @@ impl fmt::Display for Word {
 #[cfg(test)]
 mod tests {
     use super::*;
-
+    use crate::hashmap;
     #[test]
     fn convert_accent() {
         let w = Word::new("éeèaà");

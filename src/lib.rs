@@ -1,7 +1,3 @@
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
 
 mod utils;
 mod word;
@@ -17,8 +13,6 @@ use std::io::prelude::*;
 use std::path::Path;
 
 use rayon::prelude::*;
-
-use std::time::Instant;
 
 pub struct Paranagram {
     path_data: String,
@@ -36,13 +30,13 @@ impl Paranagram {
         let mut words_len = 0;
 
         // Parse the content of the data file to create a vec of all Word
-        let mut sacamot = buffer
+        let sacamot = buffer
             .lines()
             .filter_map(|s| {
                 let s = s.trim_end().to_owned();
-                if s.len() != 0 {
+                if !s.is_empty() {
                     words_len += 1;
-                    Some(Word::new(&s[..]))
+                    Some(Word::new(&s))
                 } else {
                     None
                 }
@@ -73,29 +67,22 @@ impl Paranagram {
     }
 
     pub fn generate_anagrams(&self, sentence: &Word) -> Vec<Vec<&Word>> {
-            let instant = Instant::now();
         let anagrams = self.existing_anagrams(sentence);
-            println!("0 - {:?}", instant.elapsed());
-            let instant = Instant::now();
-        let mut tuple_anagrams = anagrams.to_tuple_index();
-            println!("1 - {:?}, len: {}", instant.elapsed(), tuple_anagrams.len());
-            let instant = Instant::now();
+        let tuple_anagrams = anagrams.to_tuple_index();
         let combination = find_sum(tuple_anagrams, sentence.weight());
-            println!("2 - {:?}", instant.elapsed());
-            let instant = Instant::now();
         let combination = combination
             .into_iter()
             .map(|x| anagrams.from_tuple_index(x))
             .collect::<Vec<Vec<&Word>>>();
-        println!("3 - {:?}", instant.elapsed());
 
         combination
             .into_par_iter()
             .filter_map(|c| {
-                if &c.iter().fold(HashMap::new(), |mut acc, w| {
+                let letters = &c.iter().fold(HashMap::new(), |mut acc, w| {
                     acc.merge(w.letters());
                     acc
-                }) == sentence.letters()
+                });
+                if letters == sentence.letters()
                 {
                     Some(c)
                 } else {
@@ -119,6 +106,7 @@ impl fmt::Debug for Paranagram {
 #[cfg(test)]
 mod test {
     use super::*;
+    use std::time::Instant;
 
     #[test]
     #[ignore]

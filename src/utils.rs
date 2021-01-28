@@ -1,4 +1,4 @@
-use crate::word::{self, Word};
+use crate::word::Word;
 
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -12,7 +12,7 @@ impl IntoHashMap<char, u16> for &str {
     fn to_hashmap(self) -> HashMap<char, u16> {
         let mut letters: HashMap<char, u16> = HashMap::new();
         self.chars().for_each(|c| {
-            let mut lettre_counter = letters.entry(c).or_insert(0);
+            let lettre_counter = letters.entry(c).or_insert(0);
             *lettre_counter += 1;
         });
         letters
@@ -27,7 +27,7 @@ pub(crate) trait HashMapUtils<K, V> {
 impl HashMapUtils<char, u16> for HashMap<char, u16> {
     fn contains(&self, other: &HashMap<char, u16>) -> bool {
         for (key, val) in other.iter() {
-            if self.contains_key(key) == false {
+            if !self.contains_key(key) {
                 return false;
             }
             if self.get(key).unwrap() < val {
@@ -70,17 +70,8 @@ impl FromTupleIndex for Vec<&Word> {
     }
 }
 
-pub trait Extract {
-    fn extract(&self) -> usize;
-}
 
-impl Extract for (usize, usize) {
-    fn extract(&self) -> usize {
-        self.1
-    }
-}
 
-// TODO: Add multitheading for this part
 #[inline]
 pub fn find_sum(mut data: Vec<(usize, usize)>, goal: usize) -> Vec<Vec<(usize, usize)>> {
     data.sort_unstable_by(|a, b| a.extract().cmp(&b.extract()));
@@ -139,19 +130,17 @@ where
     I: Iterator<Item = (usize, (usize, usize))> + Clone + Send + Sync,
 {
     let mut buffer = vec![];
-    let floor_sum = floor.iter().map(|x| x.extract()).sum::<usize>();
-
-   // let mut thread_vec = Vec::new();
+    let floor_sum = floor.iter().map(|x| x.1).sum::<usize>();
 
     while let Some((index, number)) = data.next() {
-        match (number.extract() + floor_sum).cmp(&goal) {
+        match (number.1 + floor_sum).cmp(&goal) {
             Ordering::Equal => {
                 let mut v = vec![number];
                 v.extend_from_slice(&floor);
                 buffer.push(v)
             }
             Ordering::Less => {
-                if (index + 1) * number.extract() < rest {
+                if (index + 1) * number.1 < rest {
                     break;
                 }
                 let mut v = vec![number];
@@ -170,8 +159,7 @@ where
     buffer
 }
 
-
-
+#[cfg(test)]
 #[macro_export]
 macro_rules! hashmap {
     ($($k:expr => $v:expr),*) => {
@@ -185,23 +173,9 @@ macro_rules! hashmap {
     };
 }
 
-#[macro_export]
-macro_rules! vec_word_weight {
-    ($($w:expr),* ) => {
-        {
-            let mut vec = Vec::new();
-            $(
-                vec.push(Word::new_perso(String::new(), 0, $w, HashMap::new()));
-            )*
-            vec
-        }
-    };
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::time::{Duration, Instant};
 
     #[test]
     fn empty_str() {
@@ -216,15 +190,15 @@ mod tests {
 
     #[test]
     fn str_with_all_letter() {
-        let start = Instant::now();
+        let _start = Instant::now();
         "abcdefghijklmnopqrstuvwxuyz".to_hashmap();
-        // println!("str_with_all_letter {:?}", start.elapsed());
+        // println!("str_with_all_letter {:?}", _start.elapsed());
     }
     #[test]
     fn str_with_all_letter_multiple_time() {
-        let start = Instant::now();
+        let _start = Instant::now();
         "abcdefghijklmnopqrstuvwxuyzabcdefghijklmnopqrstuvwxuyzabcdefghijklmnopqrstuvwxuyzabcdefghijklmnopqrstuvwxuyzabcdefghijklmnopqrstuvwxuyzabcdefghijklmnopqrstuvwxuyzabcdefghijklmnopqrstuvwxuyz".to_hashmap();
-        // println!("str_with_all_letter_multiple_time {:?}", start.elapsed());
+        // println!("str_with_all_letter_multiple_time {:?}", _start.elapsed());
     }
 
     #[test]
