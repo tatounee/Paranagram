@@ -20,9 +20,8 @@ pub struct Paranagram {
 }
 
 impl Paranagram {
-    pub fn new(path_data: &str) -> io::Result<Self> {
+    pub fn new(path: &Path) -> io::Result<Self> {
         // Open and read the data file
-        let path = Path::new(path_data);
         let mut file = File::open(&path)?;
         let mut buffer = String::new();
         file.read_to_string(&mut buffer)?;
@@ -45,7 +44,7 @@ impl Paranagram {
 
         // Return our Paranagram
         Ok(Self {
-            path_data: path_data.to_owned(),
+            path_data: path.to_str().unwrap().to_owned(),
             sacamot,
         })
     }
@@ -113,7 +112,7 @@ mod test {
     #[ignore]
     fn init() {
         let start = Instant::now();
-        let paranagram = Paranagram::new("data/word.txt");
+        let paranagram = Paranagram::new(Path::new("data/word.txt"));
         println!("{:?} in {:?}", paranagram, start.elapsed());
         println!("{:?}", paranagram.unwrap().sacamot[0]);
     }
@@ -122,7 +121,7 @@ mod test {
     #[ignore]
     fn find_all_anagram_of_a_sentence() {
         let word = Word::new("Les parisiennes sont très jolies");
-        let paranagram = Paranagram::new("data/word.txt").unwrap();
+        let paranagram = Paranagram::new(Path::new("data/word.txt")).unwrap();
         let instant = Instant::now();
         let anagrams = paranagram.existing_anagrams(&word);
         assert_eq!(anagrams.len(), 14005);
@@ -132,7 +131,7 @@ mod test {
     #[test]
     fn find_all_anagramed_sentence_of_a_sentence() {
         let start = Instant::now();
-        let paranagram = Paranagram::new("data/word.txt").unwrap();
+        let paranagram = Paranagram::new(Path::new("data/word.txt")).unwrap();
         let middle = Instant::now();
         let anagrams = paranagram.generate_anagrams("parisiennes");
         let end = Instant::now();
