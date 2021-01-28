@@ -3,7 +3,7 @@ mod utils;
 mod word;
 
 use utils::*;
-use word::Word;
+pub use word::Word;
 
 use std::collections::HashMap;
 use std::fmt;
