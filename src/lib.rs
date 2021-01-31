@@ -1,4 +1,3 @@
-
 mod utils;
 use utils::*;
 
@@ -82,8 +81,7 @@ impl Paranagram {
                     acc.merge(w.letters());
                     acc
                 });
-                if letters == sentence.letters()
-                {
+                if letters == sentence.letters() {
                     Some(c)
                 } else {
                     None
@@ -92,11 +90,16 @@ impl Paranagram {
             .collect::<Vec<Vec<&Word>>>()
     }
 
-    pub fn generate_anagrams_debug(&self, sentence: &str) -> Vec<Vec<&Word>> {
+    pub fn generate_anagrams_debug(
+        &self,
+        sentence: &str,
+        current_step: usize,
+        goal: usize,
+    ) -> Vec<Vec<&Word>> {
         let sentence = Word::new(sentence);
         let anagrams = self.existing_anagrams(&sentence);
 
-        println!("[1/3] Possible anagrams found");
+        println!("[{}/{}] Possible anagrams found", current_step + 1, goal);
 
         let tuple_anagrams = anagrams.to_tuple_index();
         let combination = find_sum(tuple_anagrams, sentence.weight());
@@ -105,7 +108,7 @@ impl Paranagram {
             .map(|x| anagrams.from_tuple_index(x))
             .collect::<Vec<Vec<&Word>>>();
 
-        println!("[2/3] Possible sentences found");
+        println!("[{}/{}] Possible sentences found", current_step + 2, goal);
 
         let out = combination
             .into_par_iter()
@@ -114,16 +117,15 @@ impl Paranagram {
                     acc.merge(w.letters());
                     acc
                 });
-                if letters == sentence.letters()
-                {
+                if letters == sentence.letters() {
                     Some(c)
                 } else {
                     None
                 }
             })
             .collect::<Vec<Vec<&Word>>>();
-            
-        println!("[3/3] All sentences found");
+
+        println!("[{}/{}]  All sentences found", current_step + 3, goal);
 
         out
     }
