@@ -91,6 +91,42 @@ impl Paranagram {
             })
             .collect::<Vec<Vec<&Word>>>()
     }
+
+    pub fn generate_anagrams_debug(&self, sentence: &str) -> Vec<Vec<&Word>> {
+        let sentence = Word::new(sentence);
+        let anagrams = self.existing_anagrams(&sentence);
+
+        println!("[1/3] Possible anagrams found");
+
+        let tuple_anagrams = anagrams.to_tuple_index();
+        let combination = find_sum(tuple_anagrams, sentence.weight());
+        let combination = combination
+            .into_iter()
+            .map(|x| anagrams.from_tuple_index(x))
+            .collect::<Vec<Vec<&Word>>>();
+
+        println!("[2/3] Possible sentences found");
+
+        let out = combination
+            .into_par_iter()
+            .filter_map(|c| {
+                let letters = &c.iter().fold(HashMap::new(), |mut acc, w| {
+                    acc.merge(w.letters());
+                    acc
+                });
+                if letters == sentence.letters()
+                {
+                    Some(c)
+                } else {
+                    None
+                }
+            })
+            .collect::<Vec<Vec<&Word>>>();
+            
+        println!("[3/3] All sentences found");
+
+        out
+    }
 }
 
 impl fmt::Debug for Paranagram {
