@@ -49,7 +49,7 @@ impl Paranagram {
         })
     }
 
-    fn existing_anagrams(&self, sentence: &Word) -> Vec<&Word> {
+    pub fn existing_anagrams(&self, sentence: &Word) -> Vec<&Word> {
         self.sacamot
             .par_iter()
             .filter_map(|word| {
