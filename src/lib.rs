@@ -21,7 +21,7 @@ pub struct Paranagram {
 impl Paranagram {
     pub fn new(path: &Path) -> io::Result<Self> {
         // Open and read the data file
-        let mut file = File::open(&path)?;
+        let mut file = File::open(path)?;
         let mut buffer = String::new();
         file.read_to_string(&mut buffer)?;
 
@@ -193,7 +193,7 @@ mod test {
         let display = path.display();
 
         // Open a file in write-only mode, returns `io::Result<File>`
-        let mut file = match File::create(&path) {
+        let mut file = match File::create(path) {
             Err(why) => panic!("couldn't create {}: {}", display, why),
             Ok(file) => file,
         };

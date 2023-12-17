@@ -234,11 +234,14 @@ mod tests {
     macro_rules! tuple {
         ($($w: expr),*) => {
             {
-                let mut vec = vec![];
-                $(
-                    vec.push((10 * $w, $w));
-                )*
-                vec
+                // let mut vec = vec![];
+                // $(
+                //     vec.push((10 * $w, $w));
+                // )*
+                // vec
+                vec![
+                    $((10 * $w, $w),)*
+                ]
             }
         };
     }
