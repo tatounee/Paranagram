@@ -76,6 +76,43 @@ impl fmt::Display for Word {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct IndexAndWeight {
+    pub index: usize,
+    pub weight: usize,
+}
+
+impl IndexAndWeight {
+    pub fn new(index: usize, weight: usize) -> Self {
+        Self { index, weight }
+    }
+}
+
+pub trait ToIndexAndWeight {
+    fn to_index_and_weight(&self) -> Vec<IndexAndWeight>;
+}
+
+pub trait FromIndexAndWeight {
+    fn from_index_and_weight(&self, index_and_weight: Vec<&IndexAndWeight>) -> Self;
+}
+
+impl ToIndexAndWeight for Vec<&Word> {
+    #[inline]
+    fn to_index_and_weight(&self) -> Vec<IndexAndWeight> {
+        self.iter()
+            .enumerate()
+            .map(|(i, w)| IndexAndWeight::new(i, w.weight()))
+            .collect()
+    }
+}
+
+impl FromIndexAndWeight for Vec<&Word> {
+    #[inline]
+    fn from_index_and_weight(&self, index_and_weight: Vec<&IndexAndWeight>) -> Self {
+        index_and_weight.iter().map(|x| *self.get(x.index).unwrap()).collect()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -1,7 +1,10 @@
+#![allow(unused_imports)]
+
 mod utils;
 use utils::*;
 
 pub mod word;
+use word::ToIndexAndWeight;
 pub use word::Word;
 
 use std::collections::HashMap;
@@ -12,6 +15,8 @@ use std::io::prelude::*;
 use std::path::Path;
 
 use rayon::prelude::*;
+
+use crate::word::FromIndexAndWeight;
 
 pub struct Paranagram {
     path_data: String,
@@ -50,16 +55,12 @@ impl Paranagram {
 
     pub fn existing_anagrams(&self, sentence: &Word) -> Vec<&Word> {
         self.sacamot
-            .par_iter()
-            .filter_map(|word| {
+            .iter()
+            .filter(|word| {
                 if word.len() > sentence.len() {
-                    return None;
+                    return false;
                 }
-                if sentence.contains(word) {
-                    Some(word)
-                } else {
-                    None
-                }
+                sentence.contains(word)
             })
             .collect()
     }
@@ -67,15 +68,11 @@ impl Paranagram {
     pub fn generate_anagrams(&self, sentence: &str) -> Vec<Vec<&Word>> {
         let sentence = Word::new(sentence);
         let anagrams = self.existing_anagrams(&sentence);
-        let tuple_anagrams = anagrams.to_tuple_index();
-        let combination = find_sum(tuple_anagrams, sentence.weight());
-        let combination = combination
-            .into_iter()
-            .map(|x| anagrams.from_tuple_index(x))
-            .collect::<Vec<Vec<&Word>>>();
+        let tuple_anagrams = anagrams.to_index_and_weight();
 
-        combination
-            .into_par_iter()
+        find_sum(&tuple_anagrams, sentence.weight())
+            .into_iter()
+            .map(|x| (anagrams.from_index_and_weight(x)))
             .filter_map(|c| {
                 let letters = &c.iter().fold(HashMap::new(), |mut acc, w| {
                     acc.merge(w.letters());
@@ -101,11 +98,11 @@ impl Paranagram {
 
         println!("[{}/{}] Possible anagrams found", current_step + 1, goal);
 
-        let tuple_anagrams = anagrams.to_tuple_index();
-        let combination = find_sum(tuple_anagrams, sentence.weight());
+        let tuple_anagrams = anagrams.to_index_and_weight();
+        let combination = find_sum(&tuple_anagrams, sentence.weight());
         let combination = combination
             .into_iter()
-            .map(|x| anagrams.from_tuple_index(x))
+            .map(|x| anagrams.from_index_and_weight(x))
             .collect::<Vec<Vec<&Word>>>();
 
         println!("[{}/{}] Possible sentences found", current_step + 2, goal);

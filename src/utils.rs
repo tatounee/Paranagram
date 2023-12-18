@@ -1,4 +1,4 @@
-use crate::word::Word;
+use crate::word::{IndexAndWeight, Word};
 
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -47,120 +47,180 @@ impl HashMapUtils<char, u16> for HashMap<char, u16> {
     }
 }
 
-pub(crate) trait ToTupleIndex {
-    fn to_tuple_index(&self) -> Vec<(usize, usize)>;
+pub fn find_sum(data: &[IndexAndWeight], goal: usize) -> Vec<Vec<&IndexAndWeight>> {
+    find_sum_inner(data, goal, Vec::new())
 }
 
-pub(crate) trait FromTupleIndex {
-    fn from_tuple_index(&self, tuple: Vec<(usize, usize)>) -> Self;
-}
-
-impl ToTupleIndex for Vec<&Word> {
-    #[inline]
-    fn to_tuple_index(&self) -> Vec<(usize, usize)> {
-        self.iter()
-            .enumerate()
-            .map(|(i, w)| (i, w.weight()))
-            .collect()
-    }
-}
-
-impl FromTupleIndex for Vec<&Word> {
-    #[inline]
-    fn from_tuple_index(&self, tuple: Vec<(usize, usize)>) -> Self {
-        tuple.iter().map(|x| *self.get(x.0).unwrap()).collect()
-    }
-}
-
-#[inline]
-pub(crate) fn find_sum(mut data: Vec<(usize, usize)>, goal: usize) -> Vec<Vec<(usize, usize)>> {
-    data.sort_unstable_by(|a, b| a.1.cmp(&b.1));
-    let mut data = data.into_iter().enumerate().rev();
-
-    let num_cpu = num_cpus::get();
-    let mut cpu_count = 0;
-    let (tx, rx) = mpsc::channel();
-
-    let mut combinaison = Vec::new();
-    let mut thread_vec = Vec::new();
-    let rest = 0;
-    let floor: Vec<(usize, usize)> = vec![];
-    let floor_sum = floor.iter().map(|x| x.1).sum::<usize>();
-    while let Some((index, number)) = data.next() {
-        while cpu_count == num_cpu {
-            if rx.try_recv().is_ok() {
-                cpu_count -= 1
-            }
-            thread::sleep(Duration::from_millis(1));
-        }
-
-        match (number.1 + floor_sum).cmp(&goal) {
-            Ordering::Equal => {
-                let mut v = vec![number];
-                v.extend_from_slice(&floor);
-                combinaison.push(v)
-            }
-            Ordering::Less => {
-                if (index + 1) * number.1 < rest {
-                    break;
-                }
-                let mut v = vec![number];
-                let cloned_data = data.clone();
-                v.extend_from_slice(&floor);
-                let tx1 = mpsc::Sender::clone(&tx);
-                cpu_count += 1;
-                let th = thread::spawn(move || {
-                    let output = find_sum_rec(cloned_data, goal, goal - floor_sum - number.1, v);
-                    tx1.send(()).unwrap();
-                    output
-                });
-                thread_vec.push(th);
-            }
-
-            Ordering::Greater => {}
-        }
-    }
-    for t in thread_vec {
-        combinaison.append(&mut t.join().unwrap())
-    }
-    combinaison
-}
-
-fn find_sum_rec<I>(
-    mut data: I,
+pub fn find_sum_inner<'a, 'b>(
+    data: &'a [IndexAndWeight],
     goal: usize,
-    rest: usize,
-    floor: Vec<(usize, usize)>,
-) -> Vec<Vec<(usize, usize)>>
+    base: Vec<&'a IndexAndWeight>,
+) -> Vec<Vec<&'b IndexAndWeight>>
 where
-    I: Iterator<Item = (usize, (usize, usize))> + Clone + Send + Sync,
+    'a: 'b,
 {
-    let mut buffer = vec![];
-    let floor_sum = floor.iter().map(|x| x.1).sum::<usize>();
-
-    while let Some((index, number)) = data.next() {
-        match (number.1 + floor_sum).cmp(&goal) {
-            Ordering::Equal => {
-                let mut v = vec![number];
-                v.extend_from_slice(&floor);
-                buffer.push(v)
-            }
-            Ordering::Less => {
-                if (index + 1) * number.1 < rest {
-                    break;
-                }
-                let mut v = vec![number];
-                v.extend_from_slice(&floor);
-                find_sum_rec(data.clone(), goal, goal - floor_sum - number.1, v)
-                    .into_iter()
-                    .for_each(|x| buffer.push(x))
-            }
-
-            Ordering::Greater => {}
-        }
+    if goal == 0 {
+        return vec![base];
     }
-    buffer
+
+    data.iter()
+        .enumerate()
+        .filter_map(|(idx, word)| {
+            if word.weight <= goal {
+                let mut base = base.clone();
+                base.push(word);
+
+                Some(find_sum_inner(
+                    &data[idx + 1..],
+                    goal - word.weight,
+                    base,
+                ))
+            } else {
+                None
+            }
+        })
+        .fold(Vec::new(), |mut acc, mut x| {
+            acc.append(&mut x);
+            acc
+        })
 }
+
+// #[inline]
+// pub(crate) fn find_sum(mut data: &[IndexAndWeight], goal: usize) -> Vec<Vec<&IndexAndWeight>> {
+//     data.sort_unstable_by(|a, b| b.weight.cmp(&a.weight));
+//     // let data = data.into_iter().rev();
+
+//     data.clone()
+//         .into_iter()
+//         .enumerate()
+//         .filter_map(|(idx, number)| match (number.weight).cmp(&goal) {
+//             Ordering::Equal => {
+//                 let mut v = vec![number];
+//                 Some(vec![v])
+//             }
+//             Ordering::Less => {
+//                 let mut v = vec![number];
+//                 let cloned_data = &data[idx + 1..];
+//                 let output = find_sum_rec(cloned_data, goal, goal - number.weight, v);
+//                 // let output = find_sum_rec(vec![].into_iter(), goal, goal - floor_sum - number.weight, v);
+//                 Some(output)
+//             }
+
+//             Ordering::Greater => None,
+//         })
+//         .reduce(|mut acc, mut v| {
+//             acc.append(&mut v);
+//             acc
+//         })
+//         .unwrap()
+
+//     // while let Some((index, number)) = data.next() {
+//     //     while cpu_count == num_cpu {
+//     //         if rx.try_recv().is_ok() {
+//     //             cpu_count -= 1
+//     //         }
+//     //         thread::sleep(Duration::from_millis(1));
+//     //     }
+//     //
+//     //     match (number.weight + floor_sum).cmp(&goal) {
+//     //         Ordering::Equal => {
+//     //             let mut v = vec![number];
+//     //             v.extend_from_slice(&floor);
+//     //             combinaison.push(v)
+//     //         }
+//     //         Ordering::Less => {
+//     //             if (index + 1) * number.weight < rest {
+//     //                 break;
+//     //             }
+//     //             let mut v = vec![number];
+//     //             let cloned_data = data.clone();
+//     //             v.extend_from_slice(&floor);
+//     //             let tx1 = mpsc::Sender::clone(&tx);
+//     //             cpu_count += 1;
+//     //             let th = thread::spawn(move || {
+//     //                 let output = find_sum_rec(cloned_data, goal, goal - floor_sum - number.weight, v);
+//     //                 tx1.send(()).unwrap();
+//     //                 output
+//     //             });
+//     //             thread_vec.push(th);
+//     //         }
+//     //         Ordering::Greater => {}
+//     //     }
+//     // }
+//     // for t in thread_vec {
+//     //     combinaison.append(&mut t.join().unwrap())
+//     // }
+//     // combinaison
+// }
+
+// fn find_sum_rec<'a>(
+//     // mut data: I,
+//     data: &'a [IndexAndWeight],
+//     goal: usize,
+//     rest: usize,
+//     floor: Vec<&IndexAndWeight>,
+// ) -> Vec<Vec<&'a IndexAndWeight>>
+// // where
+// //     I: Iterator<Item = (usize, IndexAndWeight)> + Clone,
+// {
+//     let floor_sum = floor.iter().map(|x| x.weight).sum::<usize>();
+
+//     data.clone()
+//         .into_iter()
+//         .enumerate()
+//         .filter_map(
+//             |(idx, number)| match (number.weight + floor_sum).cmp(&goal) {
+//                 Ordering::Equal => {
+//                     let mut v = floor.clone();
+//                     v.push(number);
+//                     Some(vec![v])
+//                 }
+//                 Ordering::Less => {
+//                     if (index + 1) * number.weight < rest {
+//                         break;
+//                     }
+
+//                     let mut v = floor.clone();
+//                     v.push(number);
+//                     let cloned_data = &data[idx + 1..];
+//                     let output =
+//                         find_sum_rec(cloned_data, goal, goal - floor_sum - number.weight, v);
+//                     // let output = find_sum_rec(vec![].into_iter(), goal, goal - floor_sum - number.weight, v);
+//                     Some(output)
+//                 }
+
+//                 Ordering::Greater => None,
+//             },
+//         )
+//         .reduce(|mut acc, mut v| {
+//             acc.append(&mut v);
+//             acc
+//         })
+//         .unwrap()
+
+//     // while let Some((index, number)) = data.next() {
+//     //     match (number.weight + floor_sum).cmp(&goal) {
+//     //         Ordering::Equal => {
+//     //             let mut v = vec![number];
+//     //             v.extend_from_slice(&floor);
+//     //             buffer.push(v)
+//     //         }
+//     //         Ordering::Less => {
+//     //             if (index + 1) * number.weight < rest {
+//     //                 break;
+//     //             }
+//     //             let mut v = vec![number.clone()];
+//     //             v.extend_from_slice(&floor);
+//     //             find_sum_rec(data.clone(), goal, goal - floor_sum - number.weight, v)
+//     //                 .into_iter()
+//     //                 .for_each(|x| buffer.push(x))
+//     //         }
+
+//     //         Ordering::Greater => {}
+//     //     }
+//     // }
+//     // buffer
+// }
 
 #[cfg(test)]
 #[macro_export]
@@ -240,7 +300,7 @@ mod tests {
                 // )*
                 // vec
                 vec![
-                    $((10 * $w, $w),)*
+                    $(IndexAndWeight::new(10 * $w, $w),)*
                 ]
             }
         };
@@ -249,7 +309,7 @@ mod tests {
     #[test]
     fn much_data() {
         let start = Instant::now();
-        let data: Vec<(usize, usize)> = tuple![
+        let data: Vec<IndexAndWeight> = tuple![
             1, 1, 10, 10, 15, 20, 19, 24, 24, 23, 15, 19, 19, 23, 25, 19, 23, 27, 20, 24, 28, 15,
             28, 29, 29, 16, 20, 34, 26, 20, 24, 38, 30, 28, 28, 32, 24, 38, 24, 28, 28, 31, 35, 30,
             36, 39, 44, 39, 44, 28, 38, 24, 28, 28, 28, 32, 46, 29, 39, 38, 40, 43, 46, 47, 25, 29,
@@ -398,7 +458,7 @@ mod tests {
         ];
         println!("1 - {:?}, len: {}", start.elapsed(), data.len());
         let start = Instant::now();
-        let x = find_sum(data, 121);
+        let x = find_sum(&data, 121);
         assert_eq!(x.len(), 17525403);
         println!("2 - {:?}", start.elapsed());
     }
